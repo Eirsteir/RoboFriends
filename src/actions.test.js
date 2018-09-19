@@ -11,6 +11,44 @@ import thunkMiddleware from 'redux-thunk';
 
 const mockStore = configureMockStore([thunkMiddleware])
 
+function success() {
+  const payload = {
+    id: '1',
+    username: 'test',
+    email: 'test@gmail.com'
+  }
+
+  return {
+    type: REQUEST_ROBOTS_SUCCESS,
+    payload: payload
+  }
+}
+
+function failure() {
+  const error = 'Failed request'
+  return {
+    type: REQUEST_ROBOTS_FAILED,
+    payload: error
+  }
+}
+
+function fetchData(callSuccess) {
+  if (callSuccess) {
+    return dispatch => {
+      return fetch('https://jsonplaceholder.typicode.com/users')
+      .then(() => dispatch(success()))
+    }
+  } else {
+    return dispatch => {
+      return fetch('https://jsonplaceholder.typicode.com/users')
+      .then(() => dispatch(failure()))
+    }
+
+  }
+
+}
+
+
 describe('Actions', () => {
 
   it('should create an action to search robots', ()  => {
@@ -30,7 +68,28 @@ describe('Actions', () => {
       type: REQUEST_ROBOTS_PENDING
     }
     expect(action[0]).toEqual(expectedAction);
+  })
 
+  it('handles REQUEST_ROBOTS_SUCCESS', () => {
+    const store = mockStore({});
+    const callSuccess = true
+
+    return store.dispatch(fetchData(callSuccess))
+      .then(() => {
+        const action = store.getActions();
+        expect(action[0]).toEqual(success());
+      })
+  })
+
+  it('handles REQUEST_ROBOTS_FAILED', () => {
+    const store = mockStore({});
+    const callSuccess = false
+
+    return store.dispatch(fetchData(callSuccess))
+      .then(() => {
+        const action = store.getActions();
+        expect(action[0]).toEqual(failure());
+      })
   })
 
 })
