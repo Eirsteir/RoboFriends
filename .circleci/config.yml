@@ -17,3 +17,9 @@ jobs:
       - run: echo "Testing"
       - run: npm install
       - run: npm run test
+  workflows:
+    version: 2
+    build_test_and_lint:
+      jobs:
+        - build
+        - test
